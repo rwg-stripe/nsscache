@@ -54,7 +54,6 @@ class HttpFilesSource(source.Source):
   SSHKEY_URL = ''
   RETRY_DELAY = 5
   RETRY_MAX = 3
-  TLS_CACERTFILE = '/etc/ssl/certs/ca-certificates.crt'
 
   # for registration
   name = 'http'
@@ -75,6 +74,8 @@ class HttpFilesSource(source.Source):
       # Don't hang on to connections from broken servers indefinitely.
       conn.setopt(pycurl.TIMEOUT, 60)
       conn.setopt(pycurl.USERAGENT, 'nsscache')
+      if self.conf['tls_cacertfile']:
+        conn.setopt(pycurl.CAINFO, self.conf['tls_cacertfile'])
       if self.conf['http_proxy']:
         conn.setopt(pycurl.PROXY, self.conf['http_proxy'])
 
@@ -99,7 +100,7 @@ class HttpFilesSource(source.Source):
     if not 'retry_max' in configuration:
       configuration['retry_max'] = self.RETRY_MAX
     if not 'tls_cacertfile' in configuration:
-      configuration['tls_cacertfile'] = self.TLS_CACERTFILE
+      configuration['tls_cacertfile'] = None
     if not 'http_proxy' in configuration:
       configuration['http_proxy'] = None
 
